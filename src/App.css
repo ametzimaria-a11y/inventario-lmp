@@ -231,3 +231,14 @@ tbody tr { animation: aparecer 0.3s ease both; transition: background 0.2s; }
 
   .login-tarjeta { padding: 24px 18px; }
 }
+
+/* ---------- PAGINACIÓN ---------- */
+.paginacion {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 14px;
+  margin-top: 16px;
+}
+.paginacion span { color: var(--texto-suave); font-size: 13px; }
+.paginacion button:disabled { opacity: 0.4; cursor: not-allowed; }

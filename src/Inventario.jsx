@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 
 const API = '/.netlify/functions/productos';
 const VACIO = { nombre: '', precio: '', categoria: '', stock: '' };
+const POR_PAGINA = 3;
 
 export default function Inventario({ usuario, onLogout }) {
   const [productos, setProductos] = useState([]);
@@ -9,6 +10,7 @@ export default function Inventario({ usuario, onLogout }) {
   const [editandoId, setEditandoId] = useState(null);
   const [busqueda, setBusqueda] = useState('');
   const [filtroCategoria, setFiltroCategoria] = useState('Todas');
+  const [pagina, setPagina] = useState(1);
   const [cargando, setCargando] = useState(true);
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState('');
@@ -45,6 +47,10 @@ export default function Inventario({ usuario, onLogout }) {
       return coincideNombre && coincideCategoria;
     });
   }, [productos, busqueda, filtroCategoria]);
+
+  const totalPaginas = Math.max(1, Math.ceil(filtrados.length / POR_PAGINA));
+  const paginaActual = Math.min(pagina, totalPaginas);
+  const visibles = filtrados.slice((paginaActual - 1) * POR_PAGINA, paginaActual * POR_PAGINA);
 
   const valorTotal = productos.reduce((suma, p) => suma + p.precio * p.stock, 0);
   const stockBajo = productos.filter((p) => p.stock < 10).length;
@@ -197,9 +203,18 @@ export default function Inventario({ usuario, onLogout }) {
             type="search"
             placeholder="🔍 Buscar por nombre..."
             value={busqueda}
-            onChange={(e) => setBusqueda(e.target.value)}
+            onChange={(e) => {
+              setBusqueda(e.target.value);
+              setPagina(1);
+            }}
           />
-          <select value={filtroCategoria} onChange={(e) => setFiltroCategoria(e.target.value)}>
+          <select
+            value={filtroCategoria}
+            onChange={(e) => {
+              setFiltroCategoria(e.target.value);
+              setPagina(1);
+            }}
+          >
             <option value="Todas">Todas las categorías</option>
             {categorias.map((c) => <option key={c} value={c}>{c}</option>)}
           </select>
@@ -211,35 +226,55 @@ export default function Inventario({ usuario, onLogout }) {
         ) : filtrados.length === 0 ? (
           <p className="vacio">No hay productos que coincidan.</p>
         ) : (
-          <div className="tabla-scroll">
-            <table>
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Nombre</th>
-                  <th>Precio</th>
-                  <th>Categoría</th>
-                  <th>Stock</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtrados.map((p) => (
-                  <tr key={p.id}>
-                    <td>{p.id}</td>
-                    <td>{p.nombre}</td>
-                    <td>${p.precio.toLocaleString('es-MX')}</td>
-                    <td><span className="etiqueta">{p.categoria}</span></td>
-                    <td className={p.stock < 10 ? 'stock-bajo' : ''}>{p.stock}</td>
-                    <td className="acciones">
-                      <button className="boton-editar" onClick={() => editar(p)}>Editar</button>
-                      <button className="boton-eliminar" onClick={() => eliminar(p)}>Eliminar</button>
-                    </td>
+          <>
+            <div className="tabla-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Precio</th>
+                    <th>Categoría</th>
+                    <th>Stock</th>
+                    <th>Acciones</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {visibles.map((p) => (
+                    <tr key={p.id}>
+                      <td>{p.id}</td>
+                      <td>{p.nombre}</td>
+                      <td>${p.precio.toLocaleString('es-MX')}</td>
+                      <td><span className="etiqueta">{p.categoria}</span></td>
+                      <td className={p.stock < 10 ? 'stock-bajo' : ''}>{p.stock}</td>
+                      <td className="acciones">
+                        <button className="boton-editar" onClick={() => editar(p)}>Editar</button>
+                        <button className="boton-eliminar" onClick={() => eliminar(p)}>Eliminar</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="paginacion">
+              <button
+                className="boton-secundario"
+                onClick={() => setPagina(paginaActual - 1)}
+                disabled={paginaActual === 1}
+              >
+                ← Anterior
+              </button>
+              <span>Página {paginaActual} de {totalPaginas}</span>
+              <button
+                className="boton-secundario"
+                onClick={() => setPagina(paginaActual + 1)}
+                disabled={paginaActual === totalPaginas}
+              >
+                Siguiente →
+              </button>
+            </div>
+          </>
         )}
       </section>
     </div>
