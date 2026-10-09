@@ -180,3 +180,54 @@ tbody tr:hover { background: rgba(109, 40, 217, 0.12); }
 .boton-eliminar:hover { background: #991b1b; }
 
 .vacio { text-align: center; color: var(--texto-suave); padding: 24px 0; }
+/* ---------- ANIMACIONES ---------- */
+@keyframes aparecer {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+.login-tarjeta,
+.dato,
+.panel { animation: aparecer 0.4s ease both; }
+
+.mensaje-ok,
+.mensaje-error { animation: aparecer 0.25s ease both; }
+
+tbody tr { animation: aparecer 0.3s ease both; transition: background 0.2s; }
+
+.boton,
+.boton-secundario,
+.acciones button {
+  transition: background 0.2s, transform 0.1s, border-color 0.2s, color 0.2s;
+}
+
+.boton:active,
+.acciones button:active { transform: scale(0.97); }
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
+
+/* ---------- RESPONSIVO (celular) ---------- */
+@media (max-width: 640px) {
+  .contenedor { padding: 16px 12px 32px; }
+
+  .encabezado { flex-direction: column; align-items: flex-start; }
+  .encabezado h1 { font-size: 20px; }
+  .usuario-caja { width: 100%; justify-content: space-between; }
+
+  .resumen { grid-template-columns: 1fr; }
+  .dato strong { font-size: 22px; }
+
+  .panel { padding: 14px; }
+  .formulario { grid-template-columns: 1fr; }
+  .acciones-form .boton { width: 100%; }
+
+  .barra-herramientas { flex-direction: column; align-items: stretch; }
+  .contador { margin-left: 0; }
+
+  th, td { padding: 10px 8px; }
+  .acciones button { padding: 6px 10px; }
+
+  .login-tarjeta { padding: 24px 18px; }
+}
